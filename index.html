@@ -350,6 +350,219 @@
             text-align: center;
             font-weight: 600;
         }
+        
+        .recent-logs {
+            margin-top: 30px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .logs-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .log-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 60px;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .log-item .log-date {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .log-item .log-weight {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        .log-item .log-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .delete-log {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .data-management {
+            margin-top: 30px;
+            background: #fff3e0;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .management-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .btn-danger {
+            background: #ff4757 !important;
+        }
+        
+        .btn-danger:hover {
+            background: #ff3742 !important;
+        }
+        
+        .data-stats {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .saved-goals {
+            margin-top: 20px;
+            background: #f0f8ff;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .goals-list {
+            margin-top: 15px;
+        }
+        
+        .goal-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .goal-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .goal-category {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin: 0 10px;
+        }
+        
+        .goal-date {
+            font-size: 0.9em;
+            color: #666;
+            margin: 0 10px;
+        }
+        
+        .goal-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .goal-complete {
+            background: #2ed573;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .goal-delete {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .goal-category-select,
+        .goal-date {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+        
+        .import-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .import-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .import-textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        
+        .goal-item.completed {
+            opacity: 0.7;
+            background: #f0f8f0;
+        }
+        
+        .line-through {
+            text-decoration: line-through;
+        }
 
         .section {
             display: none;
@@ -446,6 +659,27 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Recent Logs Section -->
+                <div class="recent-logs">
+                    <h3>📋 Recent Weight Logs</h3>
+                    <div id="logs-display" class="logs-container">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Data Management Section -->
+                <div class="data-management">
+                    <h3>💾 Data Management</h3>
+                    <div class="management-buttons">
+                        <button class="btn" onclick="exportData()">📤 Export Data</button>
+                        <button class="btn" onclick="showImportDialog()">📥 Import Data</button>
+                        <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+                    </div>
+                    <div id="data-stats" class="data-stats">
+                        <!-- Database statistics will be shown here -->
+                    </div>
+                </div>
             </div>
 
             <!-- Goals Section -->
@@ -465,10 +699,25 @@
                     <p><strong>Steps:</strong> 10,000 steps per day</p>
                     <p><strong>Water:</strong> 8 glasses daily</p>
                 </div>
+                
+                <!-- Saved Goals Display -->
+                <div id="saved-goals" class="saved-goals">
+                    <h3>📋 Your Saved Goals</h3>
+                    <div id="goals-list" class="goals-list">
+                        <!-- Dynamic goals will be loaded here -->
+                    </div>
+                </div>
 
                 <div class="input-group">
                     <label for="new-goal">Set New Goal</label>
                     <input type="text" id="new-goal" placeholder="Enter your new goal">
+                    <select id="goal-category" class="goal-category">
+                        <option value="weight">Weight Loss</option>
+                        <option value="fitness">Fitness</option>
+                        <option value="nutrition">Nutrition</option>
+                        <option value="general">General Health</option>
+                    </select>
+                    <input type="date" id="goal-date" class="goal-date">
                     <button class="btn" onclick="addGoal()">Add Goal</button>
                 </div>
             </div>
@@ -538,25 +787,439 @@
     </div>
 
     <script>
+        // ========================================
+        // BODYKEY DATABASE SYSTEM
+        // ========================================
+        
+        class BodyKeyDatabase {
+            constructor() {
+                this.dbName = 'bodykey-database';
+                this.initializeDatabase();
+            }
+            
+            // Initialize database structure
+            initializeDatabase() {
+                if (!localStorage.getItem(this.dbName)) {
+                    const initialDB = {
+                        profile: {},
+                        weightLogs: [],
+                        goals: [],
+                        motivationData: {
+                            dailyQuotes: [],
+                            completedTips: [],
+                            streakCount: 0
+                        },
+                        settings: {
+                            theme: 'default',
+                            units: 'imperial',
+                            notifications: true
+                        },
+                        statistics: {
+                            totalLogins: 0,
+                            lastLogin: null,
+                            joinDate: new Date().toISOString()
+                        }
+                    };
+                    this.saveDatabase(initialDB);
+                }
+                this.updateLoginStats();
+            }
+            
+            // Get entire database
+            getDatabase() {
+                return JSON.parse(localStorage.getItem(this.dbName) || '{}');
+            }
+            
+            // Save entire database
+            saveDatabase(data) {
+                localStorage.setItem(this.dbName, JSON.stringify(data));
+            }
+            
+            // Update login statistics
+            updateLoginStats() {
+                const db = this.getDatabase();
+                db.statistics.totalLogins += 1;
+                db.statistics.lastLogin = new Date().toISOString();
+                this.saveDatabase(db);
+            }
+            
+            // PROFILE OPERATIONS
+            saveProfile(profileData) {
+                const db = this.getDatabase();
+                db.profile = { ...db.profile, ...profileData, lastUpdated: new Date().toISOString() };
+                this.saveDatabase(db);
+                return true;
+            }
+            
+            getProfile() {
+                return this.getDatabase().profile;
+            }
+            
+            // WEIGHT LOG OPERATIONS
+            addWeightLog(weightData) {
+                const db = this.getDatabase();
+                const logEntry = {
+                    id: Date.now(),
+                    date: new Date().toISOString().split('T')[0],
+                    timestamp: new Date().toISOString(),
+                    ...weightData
+                };
+                db.weightLogs.push(logEntry);
+                // Keep only last 365 entries for performance
+                if (db.weightLogs.length > 365) {
+                    db.weightLogs = db.weightLogs.slice(-365);
+                }
+                this.saveDatabase(db);
+                return logEntry;
+            }
+            
+            getWeightLogs() {
+                return this.getDatabase().weightLogs;
+            }
+            
+            getLatestWeight() {
+                const logs = this.getWeightLogs();
+                return logs.length > 0 ? logs[logs.length - 1] : null;
+            }
+            
+            deleteWeightLog(id) {
+                const db = this.getDatabase();
+                db.weightLogs = db.weightLogs.filter(log => log.id !== id);
+                this.saveDatabase(db);
+            }
+            
+            // GOALS OPERATIONS
+            addGoal(goalData) {
+                const db = this.getDatabase();
+                const goal = {
+                    id: Date.now(),
+                    text: goalData.text,
+                    targetDate: goalData.targetDate || null,
+                    category: goalData.category || 'general',
+                    completed: false,
+                    createdDate: new Date().toISOString().split('T')[0],
+                    progress: 0
+                };
+                db.goals.push(goal);
+                this.saveDatabase(db);
+                return goal;
+            }
+            
+            getGoals() {
+                return this.getDatabase().goals;
+            }
+            
+            updateGoal(id, updates) {
+                const db = this.getDatabase();
+                const goalIndex = db.goals.findIndex(goal => goal.id === id);
+                if (goalIndex !== -1) {
+                    db.goals[goalIndex] = { ...db.goals[goalIndex], ...updates };
+                    this.saveDatabase(db);
+                    return db.goals[goalIndex];
+                }
+                return null;
+            }
+            
+            deleteGoal(id) {
+                const db = this.getDatabase();
+                db.goals = db.goals.filter(goal => goal.id !== id);
+                this.saveDatabase(db);
+            }
+            
+            // MOTIVATION DATA OPERATIONS
+            saveMotivationData(data) {
+                const db = this.getDatabase();
+                db.motivationData = { ...db.motivationData, ...data };
+                this.saveDatabase(db);
+            }
+            
+            getMotivationData() {
+                return this.getDatabase().motivationData;
+            }
+            
+            // SETTINGS OPERATIONS
+            updateSettings(settings) {
+                const db = this.getDatabase();
+                db.settings = { ...db.settings, ...settings };
+                this.saveDatabase(db);
+            }
+            
+            getSettings() {
+                return this.getDatabase().settings;
+            }
+            
+            // STATISTICS
+            getStatistics() {
+                return this.getDatabase().statistics;
+            }
+            
+            // DATA EXPORT/IMPORT
+            exportData() {
+                return this.getDatabase();
+            }
+            
+            importData(data) {
+                this.saveDatabase(data);
+                this.loadAllData();
+            }
+            
+            // CLEAR ALL DATA
+            clearAllData() {
+                localStorage.removeItem(this.dbName);
+                this.initializeDatabase();
+            }
+        }
+        
+        // Initialize database
+        const db = new BodyKeyDatabase();
+        
+        // ========================================
+        // UI FUNCTIONS
+        // ========================================
+        
         // Navigation functionality
         function showSection(sectionName) {
-            // Hide all sections
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
             
-            // Remove active class from all nav buttons
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // Show selected section
             document.getElementById(sectionName).classList.add('active');
-            
-            // Add active class to clicked nav button
             document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+            
+            // Load section-specific data
+            loadSectionData(sectionName);
         }
-
+        
+        // Load data for specific sections
+        function loadSectionData(sectionName) {
+            switch(sectionName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'goals':
+                    loadGoalsData();
+                    break;
+                case 'motivation':
+                    loadMotivationData();
+                    break;
+                case 'profile':
+                    loadProfileData();
+                    break;
+            }
+        }
+        
+        // Dashboard functionality
+        function logData() {
+            const weight = document.getElementById('weight-input').value;
+            const calories = document.getElementById('calories-input').value;
+            const exercise = document.getElementById('exercise-input').value;
+            
+            if (weight) {
+                const logEntry = db.addWeightLog({
+                    weight: parseFloat(weight),
+                    calories: calories ? parseInt(calories) : null,
+                    exercise: exercise ? parseInt(exercise) : null
+                });
+                
+                updateDashboardDisplay();
+                
+                document.getElementById('log-message').innerHTML = 
+                    `<div class="status-message">✅ Data logged successfully! Entry #${logEntry.id}</div>`;
+                
+                // Clear inputs
+                document.getElementById('weight-input').value = '';
+                document.getElementById('calories-input').value = '';
+                document.getElementById('exercise-input').value = '';
+                
+                // Show recent logs
+                displayRecentLogs();
+            } else {
+                alert('Please enter your weight to log data.');
+            }
+        }
+        
+        function loadDashboardData() {
+            updateDashboardDisplay();
+            displayRecentLogs();
+            displayDataStats();
+        }
+        
+        function updateDashboardDisplay() {
+            const latestLog = db.getLatestWeight();
+            const profile = db.getProfile();
+            
+            if (latestLog) {
+                document.getElementById('current-weight').textContent = latestLog.weight;
+                
+                const goalWeight = parseFloat(document.getElementById('goal-weight').textContent);
+                const progress = (170.4 - latestLog.weight).toFixed(1);
+                document.getElementById('progress').textContent = progress;
+                
+                const height = profile.height || 70;
+                const bmi = ((latestLog.weight / (height * height)) * 703).toFixed(1);
+                document.getElementById('bmi').textContent = bmi;
+            }
+        }
+        
+        function displayRecentLogs() {
+            const logs = db.getWeightLogs().slice(-10).reverse();
+            const logsContainer = document.getElementById('logs-display');
+            
+            if (logs.length === 0) {
+                logsContainer.innerHTML = '<p style="text-align: center; color: #666;">No weight logs yet. Start tracking today!</p>';
+                return;
+            }
+            
+            logsContainer.innerHTML = logs.map(log => `
+                <div class="log-item">
+                    <div class="log-date">${new Date(log.date).toLocaleDateString()}</div>
+                    <div class="log-weight">${log.weight} lbs</div>
+                    <div class="log-details">
+                        ${log.calories ? `🍽️ ${log.calories} cal` : ''}
+                        ${log.exercise ? ` 💪 ${log.exercise} min` : ''}
+                    </div>
+                    <button class="delete-log" onclick="deleteLog(${log.id})">❌</button>
+                </div>
+            `).join('');
+        }
+        
+        function deleteLog(id) {
+            if (confirm('Delete this log entry?')) {
+                db.deleteWeightLog(id);
+                displayRecentLogs();
+                updateDashboardDisplay();
+            }
+        }
+        
+        function displayDataStats() {
+            const stats = db.getStatistics();
+            const logs = db.getWeightLogs();
+            const goals = db.getGoals();
+            const profile = db.getProfile();
+            
+            const statsContainer = document.getElementById('data-stats');
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${stats.totalLogins}</div>
+                    <div class="stat-label">Total Logins</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${logs.length}</div>
+                    <div class="stat-label">Weight Logs</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${goals.length}</div>
+                    <div class="stat-label">Goals Set</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${Object.keys(profile).length}</div>
+                    <div class="stat-label">Profile Fields</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.lastLogin ? new Date(stats.lastLogin).toLocaleDateString() : 'Today'}</div>
+                    <div class="stat-label">Last Login</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${new Date(stats.joinDate).toLocaleDateString()}</div>
+                    <div class="stat-label">Join Date</div>
+                </div>
+            `;
+        }
+        
+        // Goals functionality
+        function addGoal() {
+            const goalInput = document.getElementById('new-goal');
+            const goalText = goalInput.value.trim();
+            const goalCategory = document.getElementById('goal-category').value;
+            const goalDate = document.getElementById('goal-date').value;
+            
+            if (goalText) {
+                db.addGoal({ 
+                    text: goalText,
+                    category: goalCategory,
+                    targetDate: goalDate || null
+                });
+                goalInput.value = '';
+                document.getElementById('goal-date').value = '';
+                loadGoalsData();
+                alert('Goal added successfully!');
+            } else {
+                alert('Please enter a goal first.');
+            }
+        }
+        
+        function loadGoalsData() {
+            const goals = db.getGoals();
+            const goalsContainer = document.getElementById('goals-list');
+            
+            if (goals.length === 0) {
+                goalsContainer.innerHTML = '<p style="text-align: center; color: #666;">No goals set yet. Add your first goal above!</p>';
+                return;
+            }
+            
+            goalsContainer.innerHTML = goals.map(goal => `
+                <div class="goal-item ${goal.completed ? 'completed' : ''}">
+                    <div class="goal-text ${goal.completed ? 'line-through' : ''}">${goal.text}</div>
+                    <div class="goal-category">${goal.category}</div>
+                    ${goal.targetDate ? `<div class="goal-date">📅 ${new Date(goal.targetDate).toLocaleDateString()}</div>` : ''}
+                    <div class="goal-actions">
+                        ${!goal.completed ? `<button class="goal-complete" onclick="completeGoal(${goal.id})">✓</button>` : ''}
+                        <button class="goal-delete" onclick="deleteGoal(${goal.id})">❌</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('Goals loaded:', goals.length);
+        }
+        
+        function completeGoal(id) {
+            db.updateGoal(id, { completed: true, completedDate: new Date().toISOString().split('T')[0] });
+            loadGoalsData();
+        }
+        
+        function deleteGoal(id) {
+            if (confirm('Delete this goal?')) {
+                db.deleteGoal(id);
+                loadGoalsData();
+            }
+        }
+        
+        function loadMotivationData() {
+            const motivationData = db.getMotivationData();
+            // Update motivation display
+            console.log('Motivation data loaded:', motivationData);
+        }
+        
+        // Profile functionality
+        function updateProfile() {
+            const profileData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                height: document.getElementById('height').value,
+                age: document.getElementById('age').value
+            };
+            
+            db.saveProfile(profileData);
+            alert('Profile updated successfully!');
+            
+            // Update dashboard if height changed
+            updateDashboardDisplay();
+        }
+        
+        function loadProfileData() {
+            const profile = db.getProfile();
+            if (profile.name) {
+                document.getElementById('name').value = profile.name || '';
+                document.getElementById('email').value = profile.email || '';
+                document.getElementById('height').value = profile.height || '';
+                document.getElementById('age').value = profile.age || '';
+            }
+        }
+        
         // Add click listeners to nav buttons
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -564,114 +1227,94 @@
                 showSection(section);
             });
         });
-
-        // Dashboard functionality with localStorage persistence
-        function logData() {
-            const weight = document.getElementById('weight-input').value;
-            const calories = document.getElementById('calories-input').value;
-            const exercise = document.getElementById('exercise-input').value;
-            
-            if (weight) {
-                // Save to localStorage
-                const data = {
-                    weight: parseFloat(weight),
-                    calories: calories ? parseInt(calories) : null,
-                    exercise: exercise ? parseInt(exercise) : null,
-                    date: new Date().toISOString().split('T')[0]
-                };
-                
-                let logs = JSON.parse(localStorage.getItem('bodykey-logs') || '[]');
-                logs.push(data);
-                localStorage.setItem('bodykey-logs', JSON.stringify(logs));
-                
-                // Update current weight display
-                document.getElementById('current-weight').textContent = weight;
-                
-                // Calculate new progress
-                const goalWeight = parseFloat(document.getElementById('goal-weight').textContent);
-                const progress = (170.4 - parseFloat(weight)).toFixed(1); // Starting weight was 170.4
-                document.getElementById('progress').textContent = progress;
-                
-                // Calculate BMI (assuming height of 70 inches)
-                const bmi = ((parseFloat(weight) / (70 * 70)) * 703).toFixed(1);
-                document.getElementById('bmi').textContent = bmi;
-                
-                // Show success message
-                document.getElementById('log-message').innerHTML = 
-                    '<div class="status-message">✅ Data logged successfully and saved!</div>';
-                
-                // Clear inputs
-                document.getElementById('weight-input').value = '';
-                document.getElementById('calories-input').value = '';
-                document.getElementById('exercise-input').value = '';
-            } else {
-                alert('Please enter your weight to log data.');
-            }
+        
+        // Load all data on page load
+        function loadAllData() {
+            loadProfileData();
+            loadDashboardData();
+            loadGoalsData();
+            loadMotivationData();
         }
-
-        // Goals functionality
-        function addGoal() {
-            const goalInput = document.getElementById('new-goal');
-            const goalText = goalInput.value.trim();
-            
-            if (goalText) {
-                // Save goal to localStorage
-                let goals = JSON.parse(localStorage.getItem('bodykey-goals') || '[]');
-                goals.push({
-                    text: goalText,
-                    date: new Date().toISOString().split('T')[0],
-                    completed: false
-                });
-                localStorage.setItem('bodykey-goals', JSON.stringify(goals));
-                
-                alert('Goal added: ' + goalText);
-                goalInput.value = '';
-            } else {
-                alert('Please enter a goal first.');
-            }
-        }
-
-        // Profile functionality
-        function updateProfile() {
-            const profile = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                height: document.getElementById('height').value,
-                age: document.getElementById('age').value
-            };
-            
-            localStorage.setItem('bodykey-profile', JSON.stringify(profile));
-            alert('Profile updated successfully!');
-        }
-
-        // Load saved data on page load
+        
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Load profile data
-            const savedProfile = JSON.parse(localStorage.getItem('bodykey-profile') || '{}');
-            if (savedProfile.name) {
-                document.getElementById('name').value = savedProfile.name;
-                document.getElementById('email').value = savedProfile.email;
-                document.getElementById('height').value = savedProfile.height;
-                document.getElementById('age').value = savedProfile.age;
-            }
+            loadAllData();
             
-            // Load latest weight data
-            const logs = JSON.parse(localStorage.getItem('bodykey-logs') || '[]');
-            if (logs.length > 0) {
-                const latestLog = logs[logs.length - 1];
-                document.getElementById('current-weight').textContent = latestLog.weight;
-                
-                const goalWeight = parseFloat(document.getElementById('goal-weight').textContent);
-                const progress = (170.4 - latestLog.weight).toFixed(1);
-                document.getElementById('progress').textContent = progress;
-                
-                const bmi = ((latestLog.weight / (70 * 70)) * 703).toFixed(1);
-                document.getElementById('bmi').textContent = bmi;
-            }
-            
-            console.log('🎯 BodyKey Weight Management System Loaded Successfully!');
-            console.log('📊 GitHub Pages deployment ready!');
+            const stats = db.getStatistics();
+            console.log('🎯 BodyKey Database System Loaded Successfully!');
+            console.log(`📊 Total logins: ${stats.totalLogins}`);
+            console.log(`👤 Profile data: ${Object.keys(db.getProfile()).length} fields`);
+            console.log(`📈 Weight logs: ${db.getWeightLogs().length} entries`);
+            console.log(`🎯 Goals: ${db.getGoals().length} active`);
         });
+        
+        // Data Management Functions
+        function exportData() {
+            const data = db.exportData();
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `bodykey-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('📤 Data exported successfully!');
+        }
+        
+        function showImportDialog() {
+            const dialog = document.createElement('div');
+            dialog.className = 'import-dialog';
+            dialog.style.display = 'flex';
+            dialog.innerHTML = `
+                <div class="import-content">
+                    <h3>📥 Import BodyKey Data</h3>
+                    <p>Paste your exported JSON data below:</p>
+                    <textarea id="import-data" class="import-textarea" placeholder="Paste your BodyKey data here..."></textarea>
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn" onclick="closeImportDialog()">❌ Cancel</button>
+                        <button class="btn" onclick="importData()">✅ Import</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+        }
+        
+        function closeImportDialog() {
+            const dialog = document.querySelector('.import-dialog');
+            if (dialog) {
+                document.body.removeChild(dialog);
+            }
+        }
+        
+        function importData() {
+            const textarea = document.getElementById('import-data');
+            try {
+                const data = JSON.parse(textarea.value);
+                db.importData(data);
+                closeImportDialog();
+                alert('📥 Data imported successfully!');
+                // Refresh current section
+                const activeSection = document.querySelector('.section.active').id;
+                loadSectionData(activeSection);
+            } catch (error) {
+                alert('❌ Invalid JSON data. Please check your input.');
+            }
+        }
+        
+        function clearAllData() {
+            if (confirm('⚠️ Are you sure you want to clear ALL data? This cannot be undone!')) {
+                if (confirm('🗑️ This will delete all your weight logs, goals, and profile data. Continue?')) {
+                    db.clearAllData();
+                    alert('🗑️ All data cleared successfully!');
+                    // Refresh all displays
+                    loadAllData();
+                }
+            }
+        }
     </script>
 </body>
 </html>
