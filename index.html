@@ -339,6 +339,27 @@
             .welcome-section h1 {
                 font-size: 2em;
             }
+            
+            .profile-photo {
+                width: 120px;
+                height: 120px;
+                font-size: 36px;
+            }
+            
+            .photo-upload-overlay {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .photo-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .photo-btn {
+                width: 100%;
+                max-width: 200px;
+            }
         }
 
         .status-message {
@@ -602,6 +623,132 @@
             color: #856404;
             border: 1px solid #ffeaa7;
         }
+        
+        .profile-photo-section {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .profile-photo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .profile-photo:hover {
+            transform: scale(1.05);
+        }
+        
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .photo-upload-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid white;
+            transition: background 0.3s ease;
+        }
+        
+        .photo-upload-overlay:hover {
+            background: #5a6fd8;
+        }
+        
+        .photo-upload-overlay::before {
+            content: '📷';
+            font-size: 18px;
+        }
+        
+        .photo-upload-input {
+            display: none;
+        }
+        
+        .photo-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .photo-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .photo-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .photo-btn.danger {
+            background: #ff4757;
+        }
+        
+        .photo-btn.danger:hover {
+            background: #ff3742;
+        }
+        
+        .photo-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .photo-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .photo-info {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
 
         .section {
             display: none;
@@ -806,11 +953,49 @@
             <div id="profile" class="section profile-section">
                 <h2>👤 Your Profile</h2>
                 
+                <!-- Profile Photo Section -->
+                <div class="profile-photo-section">
+                    <h3>📷 Profile Photo</h3>
+                    <div class="profile-photo-container">
+                        <div class="profile-photo" id="profile-photo" onclick="triggerPhotoUpload()">
+                            <span id="photo-placeholder">👤</span>
+                        </div>
+                        <div class="photo-upload-overlay" onclick="triggerPhotoUpload()"></div>
+                        <input type="file" id="photo-upload-input" class="photo-upload-input" accept="image/*" onchange="handlePhotoUpload(event)">
+                    </div>
+                    
+                    <div class="photo-actions">
+                        <button class="photo-btn" onclick="triggerPhotoUpload()">
+                            📁 Choose Photo
+                        </button>
+                        <button class="photo-btn" onclick="takePhoto()">
+                            📸 Take Photo
+                        </button>
+                        <button class="photo-btn danger" onclick="removePhoto()">
+                            🗑️ Remove Photo
+                        </button>
+                    </div>
+                    
+                    <div id="photo-preview" class="photo-preview">
+                        <div class="photo-info">
+                            <p><strong>Preview:</strong></p>
+                            <img id="preview-image" src="" alt="Preview">
+                            <div id="file-info"></div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="profile-grid">
                     <div class="profile-avatar">
-                        <div class="avatar-circle">👤</div>
-                        <h3>John Doe</h3>
+                        <div class="avatar-circle" id="main-avatar">
+                            <span id="avatar-text">👤</span>
+                        </div>
+                        <h3 id="profile-display-name">John Doe</h3>
                         <p>Member since: January 2024</p>
+                        <div class="data-sync-status">
+                            <span>💾</span>
+                            <span>Profile auto-saves</span>
+                        </div>
                     </div>
                     
                     <div>
@@ -1319,10 +1504,228 @@
             
             db.saveProfile(profileData);
             showSaveIndicator(`👤 Profile updated for ${profileData.name || 'User'}`);
+            
+            // Update display name
+            updateProfileDisplay();
             alert('Profile updated successfully!');
             
             // Update dashboard if height changed
             updateDashboardDisplay();
+        }
+        
+        function updateProfileDisplay() {
+            const profile = db.getProfile();
+            const displayName = document.getElementById('profile-display-name');
+            const avatarText = document.getElementById('avatar-text');
+            
+            if (profile.name && displayName) {
+                displayName.textContent = profile.name;
+                // Update avatar with first letter of name
+                if (!profile.photo && avatarText) {
+                    avatarText.textContent = profile.name.charAt(0).toUpperCase();
+                }
+            }
+        }
+        
+        // ========================================
+        // PROFILE PHOTO FUNCTIONALITY
+        // ========================================
+        
+        function triggerPhotoUpload() {
+            document.getElementById('photo-upload-input').click();
+        }
+        
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showSaveIndicator('⚠️ Please select a valid image file', 'error');
+                    return;
+                }
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showSaveIndicator('⚠️ Image size should be less than 5MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = e.target.result;
+                    
+                    // Save photo to profile
+                    const profile = db.getProfile();
+                    profile.photo = imageData;
+                    profile.photoName = file.name;
+                    profile.photoSize = file.size;
+                    profile.photoType = file.type;
+                    
+                    db.saveProfile(profile);
+                    
+                    // Update UI
+                    displayProfilePhoto(imageData);
+                    showPhotoPreview(imageData, file);
+                    showSaveIndicator('📷 Profile photo saved successfully!');
+                    
+                    // Update main avatar
+                    updateMainAvatar(imageData);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function displayProfilePhoto(imageData) {
+            const photoContainer = document.getElementById('profile-photo');
+            const placeholder = document.getElementById('photo-placeholder');
+            
+            if (imageData) {
+                photoContainer.innerHTML = `<img src="${imageData}" alt="Profile Photo">`;
+                placeholder.style.display = 'none';
+            } else {
+                photoContainer.innerHTML = '<span id="photo-placeholder">👤</span>';
+            }
+        }
+        
+        function updateMainAvatar(imageData) {
+            const mainAvatar = document.getElementById('main-avatar');
+            const avatarText = document.getElementById('avatar-text');
+            
+            if (imageData) {
+                mainAvatar.innerHTML = `<img src="${imageData}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                const profile = db.getProfile();
+                const initial = profile.name ? profile.name.charAt(0).toUpperCase() : '👤';
+                mainAvatar.innerHTML = `<span id="avatar-text">${initial}</span>`;
+            }
+        }
+        
+        function showPhotoPreview(imageData, file) {
+            const preview = document.getElementById('photo-preview');
+            const previewImage = document.getElementById('preview-image');
+            const fileInfo = document.getElementById('file-info');
+            
+            previewImage.src = imageData;
+            fileInfo.innerHTML = `
+                <p><strong>File:</strong> ${file.name}</p>
+                <p><strong>Size:</strong> ${(file.size / 1024).toFixed(1)} KB</p>
+                <p><strong>Type:</strong> ${file.type}</p>
+            `;
+            
+            preview.style.display = 'block';
+            
+            // Auto-hide preview after 5 seconds
+            setTimeout(() => {
+                preview.style.display = 'none';
+            }, 5000);
+        }
+        
+        function takePhoto() {
+            // Check if device supports camera
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        // Create camera interface
+                        createCameraInterface(stream);
+                    })
+                    .catch(function(err) {
+                        showSaveIndicator('⚠️ Camera not available. Please choose a file instead.', 'error');
+                        console.log('Camera error:', err);
+                    });
+            } else {
+                showSaveIndicator('⚠️ Camera not supported. Please choose a file instead.', 'error');
+            }
+        }
+        
+        function createCameraInterface(stream) {
+            // Create camera modal
+            const modal = document.createElement('div');
+            modal.className = 'import-dialog';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="import-content" style="max-width: 600px;">
+                    <h3>📸 Take Profile Photo</h3>
+                    <video id="camera-video" autoplay style="width: 100%; max-width: 400px; border-radius: 10px;"></video>
+                    <canvas id="camera-canvas" style="display: none;"></canvas>
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                        <button class="btn" onclick="capturePhoto()">📷 Capture</button>
+                        <button class="btn" onclick="closeCameraInterface()">❌ Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            const video = document.getElementById('camera-video');
+            video.srcObject = stream;
+            
+            // Store stream for cleanup
+            window.currentCameraStream = stream;
+        }
+        
+        function capturePhoto() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('camera-canvas');
+            const context = canvas.getContext('2d');
+            
+            // Set canvas size to video size
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw video frame to canvas
+            context.drawImage(video, 0, 0);
+            
+            // Convert to data URL
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Save photo
+            const profile = db.getProfile();
+            profile.photo = imageData;
+            profile.photoName = `camera-${new Date().getTime()}.jpg`;
+            profile.photoType = 'image/jpeg';
+            
+            db.saveProfile(profile);
+            
+            // Update UI
+            displayProfilePhoto(imageData);
+            updateMainAvatar(imageData);
+            showSaveIndicator('📸 Photo captured and saved!');
+            
+            // Close camera
+            closeCameraInterface();
+        }
+        
+        function closeCameraInterface() {
+            // Stop camera stream
+            if (window.currentCameraStream) {
+                window.currentCameraStream.getTracks().forEach(track => track.stop());
+                window.currentCameraStream = null;
+            }
+            
+            // Remove modal
+            const modal = document.querySelector('.import-dialog');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+        
+        function removePhoto() {
+            if (confirm('Remove profile photo?')) {
+                const profile = db.getProfile();
+                delete profile.photo;
+                delete profile.photoName;
+                delete profile.photoSize;
+                delete profile.photoType;
+                
+                db.saveProfile(profile);
+                
+                // Update UI
+                displayProfilePhoto(null);
+                updateMainAvatar(null);
+                document.getElementById('photo-preview').style.display = 'none';
+                
+                showSaveIndicator('🗑️ Profile photo removed');
+            }
         }
         
         function loadProfileData() {
@@ -1332,6 +1735,15 @@
                 document.getElementById('email').value = profile.email || '';
                 document.getElementById('height').value = profile.height || '';
                 document.getElementById('age').value = profile.age || '';
+                
+                // Load profile photo
+                if (profile.photo) {
+                    displayProfilePhoto(profile.photo);
+                    updateMainAvatar(profile.photo);
+                }
+                
+                // Update profile display
+                updateProfileDisplay();
             }
         }
         
