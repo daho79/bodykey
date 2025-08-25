@@ -560,8 +560,47 @@
             background: #f0f8f0;
         }
         
-        .line-through {
-            text-decoration: line-through;
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ed573;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .save-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .auto-save {
+            font-size: 0.9em;
+            color: #2ed573;
+            margin-left: 10px;
+        }
+        
+        .data-sync-status {
+            background: #e8f5e8;
+            color: #2d5016;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .unsaved-changes {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
         .section {
@@ -574,6 +613,11 @@
     </style>
 </head>
 <body>
+    <!-- Save Indicator -->
+    <div id="save-indicator" class="save-indicator">
+        <span id="save-text">💾 Data Saved!</span>
+    </div>
+    
     <div class="container">
         <header>
             <div class="logo">
@@ -612,6 +656,13 @@
             <!-- Dashboard Section -->
             <div id="dashboard" class="section dashboard">
                 <h2>📊 Your Dashboard</h2>
+                
+                <!-- Data Sync Status -->
+                <div id="sync-status" class="data-sync-status">
+                    <span>💾</span>
+                    <span id="sync-message">All data saved automatically</span>
+                    <span id="last-save" class="auto-save"></span>
+                </div>
                 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -788,7 +839,53 @@
 
     <script>
         // ========================================
-        // BODYKEY DATABASE SYSTEM
+        // SAVE NOTIFICATION SYSTEM
+        // ========================================
+        
+        function showSaveIndicator(message = '💾 Data Saved!', type = 'success') {
+            const indicator = document.getElementById('save-indicator');
+            const text = document.getElementById('save-text');
+            
+            text.textContent = message;
+            indicator.style.background = type === 'success' ? '#2ed573' : '#ff4757';
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+            
+            // Update sync status
+            updateSyncStatus(message);
+        }
+        
+        function updateSyncStatus(action = 'Data synchronized') {
+            const syncMessage = document.getElementById('sync-message');
+            const lastSave = document.getElementById('last-save');
+            
+            if (syncMessage) {
+                syncMessage.textContent = action;
+                lastSave.textContent = `Last saved: ${new Date().toLocaleTimeString()}`;
+            }
+        }
+        
+        function showUnsavedChanges() {
+            const syncStatus = document.getElementById('sync-status');
+            if (syncStatus) {
+                syncStatus.className = 'data-sync-status unsaved-changes';
+                document.getElementById('sync-message').textContent = 'Unsaved changes detected';
+            }
+        }
+        
+        function showSavedStatus() {
+            const syncStatus = document.getElementById('sync-status');
+            if (syncStatus) {
+                syncStatus.className = 'data-sync-status';
+                document.getElementById('sync-message').textContent = 'All data saved automatically';
+            }
+        }
+        
+        // ========================================
+        // ENHANCED DATABASE SYSTEM
         // ========================================
         
         class BodyKeyDatabase {
@@ -1019,6 +1116,9 @@
             const exercise = document.getElementById('exercise-input').value;
             
             if (weight) {
+                // Show saving indicator
+                showUnsavedChanges();
+                
                 const logEntry = db.addWeightLog({
                     weight: parseFloat(weight),
                     calories: calories ? parseInt(calories) : null,
@@ -1027,8 +1127,12 @@
                 
                 updateDashboardDisplay();
                 
+                // Show success notifications
+                showSaveIndicator(`📊 Weight logged: ${weight} lbs`);
+                showSavedStatus();
+                
                 document.getElementById('log-message').innerHTML = 
-                    `<div class="status-message">✅ Data logged successfully! Entry #${logEntry.id}</div>`;
+                    `<div class="status-message">✅ Weight entry saved! ID: #${logEntry.id}</div>`;
                 
                 // Clear inputs
                 document.getElementById('weight-input').value = '';
@@ -1037,7 +1141,11 @@
                 
                 // Show recent logs
                 displayRecentLogs();
+                
+                // Update data stats
+                displayDataStats();
             } else {
+                showSaveIndicator('⚠️ Please enter weight first', 'error');
                 alert('Please enter your weight to log data.');
             }
         }
@@ -1138,16 +1246,20 @@
             const goalDate = document.getElementById('goal-date').value;
             
             if (goalText) {
-                db.addGoal({ 
+                const goal = db.addGoal({ 
                     text: goalText,
                     category: goalCategory,
                     targetDate: goalDate || null
                 });
+                
                 goalInput.value = '';
                 document.getElementById('goal-date').value = '';
                 loadGoalsData();
+                
+                showSaveIndicator(`🎯 Goal added: ${goalText.substring(0, 30)}${goalText.length > 30 ? '...' : ''}`);
                 alert('Goal added successfully!');
             } else {
+                showSaveIndicator('⚠️ Please enter a goal first', 'error');
                 alert('Please enter a goal first.');
             }
         }
@@ -1204,6 +1316,7 @@
             };
             
             db.saveProfile(profileData);
+            showSaveIndicator(`👤 Profile updated for ${profileData.name || 'User'}`);
             alert('Profile updated successfully!');
             
             // Update dashboard if height changed
@@ -1240,12 +1353,52 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadAllData();
             
+            // Add auto-save listeners for profile fields
+            const profileFields = ['name', 'email', 'height', 'age'];
+            profileFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', function() {
+                        const profileData = {
+                            name: document.getElementById('name').value,
+                            email: document.getElementById('email').value,
+                            height: document.getElementById('height').value,
+                            age: document.getElementById('age').value
+                        };
+                        if (profileData[fieldId.replace('-', '')]) {
+                            db.saveProfile(profileData);
+                            showSaveIndicator(`👤 ${fieldId} auto-saved`);
+                            updateDashboardDisplay(); // Update BMI if height changed
+                        }
+                    });
+                }
+            });
+            
+            // Add input validation feedback
+            const weightInput = document.getElementById('weight-input');
+            if (weightInput) {
+                weightInput.addEventListener('input', function() {
+                    const value = parseFloat(this.value);
+                    if (value && (value < 50 || value > 1000)) {
+                        this.style.borderColor = '#ff4757';
+                        showSaveIndicator('⚠️ Please check weight value', 'error');
+                    } else {
+                        this.style.borderColor = '#e0e0e0';
+                    }
+                });
+            }
+            
             const stats = db.getStatistics();
             console.log('🎯 BodyKey Database System Loaded Successfully!');
             console.log(`📊 Total logins: ${stats.totalLogins}`);
             console.log(`👤 Profile data: ${Object.keys(db.getProfile()).length} fields`);
             console.log(`📈 Weight logs: ${db.getWeightLogs().length} entries`);
             console.log(`🎯 Goals: ${db.getGoals().length} active`);
+            
+            // Show welcome save status
+            setTimeout(() => {
+                updateSyncStatus('System ready - all data will auto-save');
+            }, 1000);
         });
         
         // Data Management Functions
