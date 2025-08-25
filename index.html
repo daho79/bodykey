@@ -666,16 +666,16 @@
                 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h3 id="current-weight">165.2</h3>
-                        <p>Current Weight (lbs)</p>
+                        <h3 id="current-weight">75.0</h3>
+                        <p>Current Weight (kg)</p>
                     </div>
                     <div class="stat-card">
-                        <h3 id="goal-weight">150.0</h3>
-                        <p>Goal Weight (lbs)</p>
+                        <h3 id="goal-weight">68.0</h3>
+                        <p>Goal Weight (kg)</p>
                     </div>
                     <div class="stat-card">
-                        <h3 id="progress">-5.2</h3>
-                        <p>Progress (lbs)</p>
+                        <h3 id="progress">-2.4</h3>
+                        <p>Progress (kg)</p>
                     </div>
                     <div class="stat-card">
                         <h3 id="bmi">24.8</h3>
@@ -687,8 +687,8 @@
                     <div>
                         <h3>📝 Log Today's Data</h3>
                         <div class="input-group">
-                            <label for="weight-input">Weight (lbs)</label>
-                            <input type="number" id="weight-input" placeholder="Enter your weight" step="0.1">
+                            <label for="weight-input">Weight (kg)</label>
+                            <input type="number" id="weight-input" placeholder="Enter your weight in kg" step="0.1">
                         </div>
                         <div class="input-group">
                             <label for="calories-input">Calories</label>
@@ -739,7 +739,7 @@
                 
                 <div class="goal-card">
                     <h3>Primary Weight Goal</h3>
-                    <p><strong>Target:</strong> Lose 15.2 lbs</p>
+                    <p><strong>Target:</strong> Lose 7.0 kg</p>
                     <p><strong>Timeline:</strong> 3 months</p>
                     <p><strong>Progress:</strong> 34% complete</p>
                 </div>
@@ -823,8 +823,8 @@
                             <input type="email" id="email" value="john@example.com">
                         </div>
                         <div class="input-group">
-                            <label for="height">Height (inches)</label>
-                            <input type="number" id="height" value="70">
+                            <label for="height">Height (cm)</label>
+                            <input type="number" id="height" value="178">
                         </div>
                         <div class="input-group">
                             <label for="age">Age</label>
@@ -908,7 +908,7 @@
                         },
                         settings: {
                             theme: 'default',
-                            units: 'imperial',
+                            units: 'metric',
                             notifications: true
                         },
                         statistics: {
@@ -1128,7 +1128,7 @@
                 updateDashboardDisplay();
                 
                 // Show success notifications
-                showSaveIndicator(`📊 Weight logged: ${weight} lbs`);
+                showSaveIndicator(`📊 Weight logged: ${weight} kg`);
                 showSavedStatus();
                 
                 document.getElementById('log-message').innerHTML = 
@@ -1164,11 +1164,13 @@
                 document.getElementById('current-weight').textContent = latestLog.weight;
                 
                 const goalWeight = parseFloat(document.getElementById('goal-weight').textContent);
-                const progress = (170.4 - latestLog.weight).toFixed(1);
+                const progress = (77.4 - latestLog.weight).toFixed(1); // Starting weight was 77.4 kg
                 document.getElementById('progress').textContent = progress;
                 
-                const height = profile.height || 70;
-                const bmi = ((latestLog.weight / (height * height)) * 703).toFixed(1);
+                // BMI calculation with kg and cm (metric system)
+                const heightCm = profile.height || 178; // Default height in cm
+                const heightM = heightCm / 100; // Convert to meters
+                const bmi = (latestLog.weight / (heightM * heightM)).toFixed(1);
                 document.getElementById('bmi').textContent = bmi;
             }
         }
@@ -1185,7 +1187,7 @@
             logsContainer.innerHTML = logs.map(log => `
                 <div class="log-item">
                     <div class="log-date">${new Date(log.date).toLocaleDateString()}</div>
-                    <div class="log-weight">${log.weight} lbs</div>
+                    <div class="log-weight">${log.weight} kg</div>
                     <div class="log-details">
                         ${log.calories ? `🍽️ ${log.calories} cal` : ''}
                         ${log.exercise ? ` 💪 ${log.exercise} min` : ''}
@@ -1379,9 +1381,9 @@
             if (weightInput) {
                 weightInput.addEventListener('input', function() {
                     const value = parseFloat(this.value);
-                    if (value && (value < 50 || value > 1000)) {
+                    if (value && (value < 20 || value > 450)) {
                         this.style.borderColor = '#ff4757';
-                        showSaveIndicator('⚠️ Please check weight value', 'error');
+                        showSaveIndicator('⚠️ Please check weight value (20-450 kg)', 'error');
                     } else {
                         this.style.borderColor = '#e0e0e0';
                     }
