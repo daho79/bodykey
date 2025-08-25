@@ -1345,18 +1345,54 @@
             const latestLog = db.getLatestWeight();
             const profile = db.getProfile();
             
+            console.log('Dashboard update - Latest log:', latestLog);
+            console.log('Dashboard update - Profile:', profile);
+            
+            // Always update the display, whether there's a log or not
+            const currentWeightElement = document.getElementById('current-weight');
+            const progressElement = document.getElementById('progress');
+            const bmiElement = document.getElementById('bmi');
+            const goalWeightElement = document.getElementById('goal-weight');
+            
             if (latestLog) {
-                document.getElementById('current-weight').textContent = latestLog.weight;
+                // Update with actual logged data
+                currentWeightElement.textContent = latestLog.weight.toFixed(1);
                 
-                const goalWeight = parseFloat(document.getElementById('goal-weight').textContent);
-                const progress = (77.4 - latestLog.weight).toFixed(1); // Starting weight was 77.4 kg
-                document.getElementById('progress').textContent = progress;
+                const goalWeight = parseFloat(goalWeightElement.textContent);
+                const startingWeight = 77.4; // Starting weight in kg
+                const progress = (startingWeight - latestLog.weight).toFixed(1);
+                progressElement.textContent = progress;
                 
                 // BMI calculation with kg and cm (metric system)
                 const heightCm = profile.height || 178; // Default height in cm
                 const heightM = heightCm / 100; // Convert to meters
                 const bmi = (latestLog.weight / (heightM * heightM)).toFixed(1);
-                document.getElementById('bmi').textContent = bmi;
+                bmiElement.textContent = bmi;
+                
+                console.log('Dashboard updated with logged data:', {
+                    weight: latestLog.weight,
+                    progress: progress,
+                    bmi: bmi,
+                    height: heightCm
+                });
+            } else {
+                // Show default values when no data is logged yet
+                currentWeightElement.textContent = '--';
+                progressElement.textContent = '0.0';
+                
+                // Calculate BMI with default values if height is available
+                const heightCm = profile.height || 178;
+                const heightM = heightCm / 100;
+                const defaultWeight = 75.0; // Default weight for BMI calculation
+                const defaultBmi = (defaultWeight / (heightM * heightM)).toFixed(1);
+                bmiElement.textContent = defaultBmi;
+                
+                console.log('Dashboard updated with default values:', {
+                    weight: '--',
+                    progress: '0.0',
+                    bmi: defaultBmi,
+                    height: heightCm
+                });
             }
         }
         
@@ -1507,10 +1543,11 @@
             
             // Update display name
             updateProfileDisplay();
-            alert('Profile updated successfully!');
             
-            // Update dashboard if height changed
+            // Update dashboard display (especially important for BMI when height changes)
             updateDashboardDisplay();
+            
+            alert('Profile updated successfully!');
         }
         
         function updateProfileDisplay() {
@@ -1761,6 +1798,8 @@
             loadDashboardData();
             loadGoalsData();
             loadMotivationData();
+            // Ensure dashboard is updated after all data is loaded
+            updateDashboardDisplay();
         }
         
         // Initialize on page load
@@ -1782,7 +1821,16 @@
                         if (profileData[fieldId.replace('-', '')]) {
                             db.saveProfile(profileData);
                             showSaveIndicator(`👤 ${fieldId} auto-saved`);
-                            updateDashboardDisplay(); // Update BMI if height changed
+                            
+                            // Update dashboard display if height changed (for BMI calculation)
+                            if (fieldId === 'height') {
+                                updateDashboardDisplay();
+                            }
+                            
+                            // Update profile display if name changed
+                            if (fieldId === 'name') {
+                                updateProfileDisplay();
+                            }
                         }
                     });
                 }
