@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BodyKey Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .status {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 BodyKey Weight Management</h1>
+        <p>Congratulations! The website is working!</p>
+        
+        <div class="status">
+            <h2>✅ Status Check</h2>
+            <p>✓ Server is running<br>
+               ✓ HTML is loading<br>
+               ✓ CSS is working<br>
+               ✓ Ready for Next.js</p>
+        </div>
+        
+        <p>
+            <a href="#" class="button" onclick="testNavigation()">Test Navigation</a>
+        </p>
+        
+        <div id="test-result" style="margin-top: 20px;"></div>
+    </div>
+    
+    <script>
+        function testNavigation() {
+            document.getElementById('test-result').innerHTML = 
+                '<div style="background: rgba(0,255,0,0.2); padding: 10px; border-radius: 5px;">JavaScript is working! 🎉</div>';
+        }
+        
+        // Auto-test on load
+        setTimeout(() => {
+            console.log('BodyKey test page loaded successfully');
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -817,7 +817,7 @@
                         <p>Current Weight (kg)</p>
                     </div>
                     <div class="stat-card">
-                        <h3 id="goal-weight">68.0</h3>
+                        <h3 id="goal-weight">--</h3>
                         <p>Goal Weight (kg)</p>
                     </div>
                     <div class="stat-card">
@@ -847,6 +847,20 @@
                         </div>
                         <button class="btn" onclick="logData()">Log Data</button>
                         <div id="log-message"></div>
+                        
+                        <!-- Goal Weight Setting Section -->
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                            <h4>🎯 Set Goal Weight</h4>
+                            <div class="input-group">
+                                <label for="goal-weight-input">Target Weight (kg)</label>
+                                <input type="number" id="goal-weight-input" placeholder="Enter your goal weight" step="0.1">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn" onclick="setGoalWeight()">Set Goal</button>
+                                <button class="btn btn-danger" onclick="clearGoalWeight()">Clear Goal</button>
+                            </div>
+                            <div id="goal-message"></div>
+                        </div>
                     </div>
 
                     <div class="progress-chart">
@@ -886,9 +900,9 @@
                 
                 <div class="goal-card">
                     <h3>Primary Weight Goal</h3>
-                    <p><strong>Target:</strong> Lose 7.0 kg</p>
-                    <p><strong>Timeline:</strong> 3 months</p>
-                    <p><strong>Progress:</strong> 34% complete</p>
+                    <p><strong>Target:</strong> No goal set</p>
+                    <p><strong>Timeline:</strong> Set your target weight below</p>
+                    <p><strong>Progress:</strong> Ready to start</p>
                 </div>
 
                 <div class="goal-card">
@@ -1208,6 +1222,26 @@
                 this.saveDatabase(db);
             }
             
+            // Clear goal weight from profile
+            clearGoalWeight() {
+                const profile = this.getProfile();
+                delete profile.goalWeight;
+                this.saveProfile(profile);
+            }
+            
+            // Set goal weight
+            setGoalWeight(weight) {
+                const profile = this.getProfile();
+                profile.goalWeight = parseFloat(weight);
+                this.saveProfile(profile);
+            }
+            
+            // Get goal weight
+            getGoalWeight() {
+                const profile = this.getProfile();
+                return profile.goalWeight || null;
+            }
+            
             // MOTIVATION DATA OPERATIONS
             saveMotivationData(data) {
                 const db = this.getDatabase();
@@ -1344,9 +1378,11 @@
         function updateDashboardDisplay() {
             const latestLog = db.getLatestWeight();
             const profile = db.getProfile();
+            const goalWeight = db.getGoalWeight();
             
             console.log('Dashboard update - Latest log:', latestLog);
             console.log('Dashboard update - Profile:', profile);
+            console.log('Dashboard update - Goal weight:', goalWeight);
             
             // Always update the display, whether there's a log or not
             const currentWeightElement = document.getElementById('current-weight');
@@ -1354,14 +1390,27 @@
             const bmiElement = document.getElementById('bmi');
             const goalWeightElement = document.getElementById('goal-weight');
             
+            // Update goal weight display
+            if (goalWeight) {
+                goalWeightElement.textContent = goalWeight.toFixed(1);
+            } else {
+                goalWeightElement.textContent = '--';
+            }
+            
             if (latestLog) {
                 // Update with actual logged data
                 currentWeightElement.textContent = latestLog.weight.toFixed(1);
                 
-                const goalWeight = parseFloat(goalWeightElement.textContent);
-                const startingWeight = 77.4; // Starting weight in kg
-                const progress = (startingWeight - latestLog.weight).toFixed(1);
-                progressElement.textContent = progress;
+                // Calculate progress based on goal weight or starting weight
+                let progress;
+                if (goalWeight) {
+                    progress = (latestLog.weight - goalWeight).toFixed(1);
+                    progressElement.textContent = progress;
+                } else {
+                    const startingWeight = 77.4; // Starting weight in kg
+                    progress = (startingWeight - latestLog.weight).toFixed(1);
+                    progressElement.textContent = progress;
+                }
                 
                 // BMI calculation with kg and cm (metric system)
                 const heightCm = profile.height || 178; // Default height in cm
@@ -1373,7 +1422,8 @@
                     weight: latestLog.weight,
                     progress: progress,
                     bmi: bmi,
-                    height: heightCm
+                    height: heightCm,
+                    goalWeight: goalWeight
                 });
             } else {
                 // Show default values when no data is logged yet
@@ -1391,8 +1441,40 @@
                     weight: '--',
                     progress: '0.0',
                     bmi: defaultBmi,
-                    height: heightCm
+                    height: heightCm,
+                    goalWeight: goalWeight
                 });
+            }
+        }
+        
+        // Goal weight management functions
+        function setGoalWeight() {
+            const goalInput = document.getElementById('goal-weight-input');
+            const goalValue = parseFloat(goalInput.value);
+            
+            if (goalValue && goalValue > 0) {
+                db.setGoalWeight(goalValue);
+                updateDashboardDisplay();
+                
+                document.getElementById('goal-message').innerHTML = 
+                    `<div class="status-message">✅ Goal weight set to ${goalValue} kg!</div>`;
+                showSaveIndicator(`🎯 Goal weight set: ${goalValue} kg`);
+                
+                goalInput.value = '';
+            } else {
+                showSaveIndicator('⚠️ Please enter a valid weight', 'error');
+                alert('Please enter a valid goal weight.');
+            }
+        }
+        
+        function clearGoalWeight() {
+            if (confirm('Clear your goal weight?')) {
+                db.clearGoalWeight();
+                updateDashboardDisplay();
+                
+                document.getElementById('goal-message').innerHTML = 
+                    `<div class="status-message">🗑️ Goal weight cleared!</div>`;
+                showSaveIndicator('🗑️ Goal weight cleared');
             }
         }
         
