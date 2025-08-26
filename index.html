@@ -380,9 +380,41 @@
         }
         
         .logs-container {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             margin-top: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logs-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border: none;
+        }
+        
+        .logs-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        
+        .logs-table tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .logs-table tr:last-child td {
+            border-bottom: none;
         }
         
         .log-item {
@@ -405,11 +437,27 @@
         .log-item .log-weight {
             font-size: 1.1em;
             font-weight: bold;
+            color: #2c3e50;
         }
         
         .log-item .log-details {
             font-size: 0.9em;
             color: #666;
+        }
+        
+        .weight-cell {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .details-cell {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .actions-cell {
+            text-align: center;
         }
         
         .delete-log {
@@ -886,6 +934,7 @@
                     <div class="management-buttons">
                         <button class="btn" onclick="exportData()">📤 Export Data</button>
                         <button class="btn" onclick="showImportDialog()">📥 Import Data</button>
+                        <button class="btn" onclick="clearDemoData()" style="background: #f39c12;">🧽 Clear Demo Data</button>
                         <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
                     </div>
                     <div id="data-stats" class="data-stats">
@@ -1097,13 +1146,77 @@
             initializeDatabase() {
                 if (!localStorage.getItem(this.dbName)) {
                     const initialDB = {
-                        profile: {},
-                        weightLogs: [],
-                        goals: [],
+                        profile: {
+                            name: "Demo User",
+                            height: 178,
+                            age: 30
+                        },
+                        weightLogs: [
+                            {
+                                id: Date.now() - 604800000, // 7 days ago
+                                date: new Date(Date.now() - 604800000).toISOString().split('T')[0],
+                                timestamp: new Date(Date.now() - 604800000).toISOString(),
+                                weight: 77.4,
+                                calories: 2000,
+                                exercise: 30
+                            },
+                            {
+                                id: Date.now() - 518400000, // 6 days ago
+                                date: new Date(Date.now() - 518400000).toISOString().split('T')[0],
+                                timestamp: new Date(Date.now() - 518400000).toISOString(),
+                                weight: 76.8,
+                                calories: 1950,
+                                exercise: 45
+                            },
+                            {
+                                id: Date.now() - 432000000, // 5 days ago
+                                date: new Date(Date.now() - 432000000).toISOString().split('T')[0],
+                                timestamp: new Date(Date.now() - 432000000).toISOString(),
+                                weight: 76.2,
+                                calories: null,
+                                exercise: 20
+                            },
+                            {
+                                id: Date.now() - 345600000, // 4 days ago
+                                date: new Date(Date.now() - 345600000).toISOString().split('T')[0],
+                                timestamp: new Date(Date.now() - 345600000).toISOString(),
+                                weight: 75.9,
+                                calories: 2100,
+                                exercise: null
+                            },
+                            {
+                                id: Date.now() - 259200000, // 3 days ago
+                                date: new Date(Date.now() - 259200000).toISOString().split('T')[0],
+                                timestamp: new Date(Date.now() - 259200000).toISOString(),
+                                weight: 75.5,
+                                calories: 1900,
+                                exercise: 40
+                            }
+                        ],
+                        goals: [
+                            {
+                                id: Date.now() - 86400000,
+                                text: "Lose 5 kg in 3 months",
+                                targetDate: new Date(Date.now() + 7776000000).toISOString().split('T')[0], // 3 months from now
+                                category: "weight",
+                                completed: false,
+                                createdDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+                                progress: 30
+                            },
+                            {
+                                id: Date.now() - 172800000,
+                                text: "Exercise 30 minutes daily",
+                                targetDate: null,
+                                category: "fitness",
+                                completed: false,
+                                createdDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
+                                progress: 0
+                            }
+                        ],
                         motivationData: {
                             dailyQuotes: [],
                             completedTips: [],
-                            streakCount: 0
+                            streakCount: 5
                         },
                         settings: {
                             theme: 'default',
@@ -1111,12 +1224,15 @@
                             notifications: true
                         },
                         statistics: {
-                            totalLogins: 0,
-                            lastLogin: null,
-                            joinDate: new Date().toISOString()
+                            totalLogins: 1,
+                            lastLogin: new Date().toISOString(),
+                            joinDate: new Date(Date.now() - 604800000).toISOString() // Started a week ago
                         }
                     };
                     this.saveDatabase(initialDB);
+                    console.log('🎯 Demo data initialized with sample weight logs and goals!');
+                } else {
+                    console.log('📊 Existing data found, loading user data...');
                 }
                 this.updateLoginStats();
             }
@@ -1479,25 +1595,71 @@
         }
         
         function displayRecentLogs() {
-            const logs = db.getWeightLogs().slice(-10).reverse();
+            const logs = db.getWeightLogs().slice(-15).reverse(); // Show more logs
             const logsContainer = document.getElementById('logs-display');
             
             if (logs.length === 0) {
-                logsContainer.innerHTML = '<p style="text-align: center; color: #666;">No weight logs yet. Start tracking today!</p>';
+                logsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <h4>📝 No weight logs yet</h4>
+                        <p>Start tracking your weight to see your progress here!</p>
+                        <button class="btn" onclick="document.getElementById('weight-input').focus()">📊 Log Your First Entry</button>
+                    </div>
+                `;
                 return;
             }
             
-            logsContainer.innerHTML = logs.map(log => `
-                <div class="log-item">
-                    <div class="log-date">${new Date(log.date).toLocaleDateString()}</div>
-                    <div class="log-weight">${log.weight} kg</div>
-                    <div class="log-details">
-                        ${log.calories ? `🍽️ ${log.calories} cal` : ''}
-                        ${log.exercise ? ` 💪 ${log.exercise} min` : ''}
-                    </div>
-                    <button class="delete-log" onclick="deleteLog(${log.id})">❌</button>
+            // Create a proper table for the logs
+            logsContainer.innerHTML = `
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>📅 Date</th>
+                            <th>⚖️ Weight</th>
+                            <th>📊 Details</th>
+                            <th>🔧 Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${logs.map(log => {
+                            const date = new Date(log.date);
+                            const formattedDate = date.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                            });
+                            
+                            const details = [];
+                            if (log.calories) details.push(`🍽️ ${log.calories} cal`);
+                            if (log.exercise) details.push(`💪 ${log.exercise} min`);
+                            
+                            return `
+                                <tr>
+                                    <td>
+                                        <strong>${formattedDate}</strong><br>
+                                        <small style="color: #888;">${date.toLocaleDateString('en-US', { weekday: 'short' })}</small>
+                                    </td>
+                                    <td class="weight-cell">
+                                        <strong>${log.weight} kg</strong>
+                                    </td>
+                                    <td class="details-cell">
+                                        ${details.length > 0 ? details.join('<br>') : '<span style="color: #ccc;">No additional data</span>'}
+                                    </td>
+                                    <td class="actions-cell">
+                                        <button class="delete-log" onclick="deleteLog(${log.id})" title="Delete this entry">
+                                            🗑️
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 15px; text-align: center; color: #666; font-size: 0.9em;">
+                    📈 Showing last ${logs.length} entries • Total logged: ${db.getWeightLogs().length}
                 </div>
-            `).join('');
+            `;
         }
         
         function deleteLog(id) {
@@ -1513,32 +1675,46 @@
             const logs = db.getWeightLogs();
             const goals = db.getGoals();
             const profile = db.getProfile();
+            const latestLog = db.getLatestWeight();
+            
+            // Calculate additional stats
+            const completedGoals = goals.filter(goal => goal.completed).length;
+            const totalWeightChange = logs.length > 1 ? (logs[logs.length - 1].weight - logs[0].weight).toFixed(1) : 0;
+            const daysTracking = logs.length > 0 ? Math.ceil((new Date() - new Date(logs[0].date)) / (1000 * 60 * 60 * 24)) : 0;
             
             const statsContainer = document.getElementById('data-stats');
             statsContainer.innerHTML = `
                 <div class="stat-item">
-                    <div class="stat-number">${stats.totalLogins}</div>
-                    <div class="stat-label">Total Logins</div>
-                </div>
-                <div class="stat-item">
                     <div class="stat-number">${logs.length}</div>
-                    <div class="stat-label">Weight Logs</div>
+                    <div class="stat-label">📈 Weight Logs</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">${goals.length}</div>
-                    <div class="stat-label">Goals Set</div>
+                    <div class="stat-label">🎯 Total Goals</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">${Object.keys(profile).length}</div>
-                    <div class="stat-label">Profile Fields</div>
+                    <div class="stat-number">${completedGoals}</div>
+                    <div class="stat-label">✅ Completed Goals</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">${stats.lastLogin ? new Date(stats.lastLogin).toLocaleDateString() : 'Today'}</div>
-                    <div class="stat-label">Last Login</div>
+                    <div class="stat-number">${daysTracking}</div>
+                    <div class="stat-label">📅 Days Tracking</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${totalWeightChange > 0 ? '+' : ''}${totalWeightChange}</div>
+                    <div class="stat-label">⚖️ Total Change (kg)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${latestLog ? latestLog.weight + ' kg' : '--'}</div>
+                    <div class="stat-label">📊 Latest Weight</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.totalLogins}</div>
+                    <div class="stat-label">🔄 Total Logins</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">${new Date(stats.joinDate).toLocaleDateString()}</div>
-                    <div class="stat-label">Join Date</div>
+                    <div class="stat-label">🎉 Member Since</div>
                 </div>
             `;
         }
@@ -2010,6 +2186,35 @@
                     // Refresh all displays
                     loadAllData();
                 }
+            }
+        }
+        
+        function clearDemoData() {
+            if (confirm('🧽 Clear demo data and start fresh? This will remove sample entries but keep your structure.')) {
+                const freshDB = {
+                    profile: {},
+                    weightLogs: [],
+                    goals: [],
+                    motivationData: {
+                        dailyQuotes: [],
+                        completedTips: [],
+                        streakCount: 0
+                    },
+                    settings: {
+                        theme: 'default',
+                        units: 'metric',
+                        notifications: true
+                    },
+                    statistics: {
+                        totalLogins: 1,
+                        lastLogin: new Date().toISOString(),
+                        joinDate: new Date().toISOString()
+                    }
+                };
+                db.saveDatabase(freshDB);
+                alert('✨ Demo data cleared! You can now start tracking your own data.');
+                // Refresh all displays
+                loadAllData();
             }
         }
     </script>
